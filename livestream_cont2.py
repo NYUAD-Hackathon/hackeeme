@@ -29,10 +29,16 @@ stream = Stream(
 
 # Initialize trace of streaming plot by embedding the unique stream_id
 trace1 = Scatter(
-    x=[],
-    y=[],
+    x1=[],
+    y1=[],
     mode='lines+markers',
     stream=stream         # (!) embed stream id, 1 per trace
+
+)
+trace2= Scatter(
+    x2=[],
+    y2=[],
+    mode=''
 )
 
 data = Data([trace1])
