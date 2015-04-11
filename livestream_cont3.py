@@ -24,7 +24,7 @@ footer = "D"
 byte = ""
 temp = 0
 heartrate = 0
-
+help1 = 0
 
 
 
@@ -48,13 +48,36 @@ trace1 = Scatter(
     x=[],
     y=[],
     mode='lines+markers',
-    stream=stream         # (!) embed stream id, 1 per trace
+    stream=stream,         # (!) embed stream id, 1 per trace
+    line=Line(
+            color='rgb(44, 160, 44)',
+            width=3,
+            shape='spline',
+            smoothing=1.3
+        )
 )
 
 data = Data([trace1])
 
 #Add title to layout object
-layout = Layout(title='Heart Rate')
+
+
+layout = Layout(
+    autosize=True,
+    width=1860,
+    height=1313,
+    xaxis=XAxis(
+        title='Time',
+        type='category',
+        autorange=True
+    ),
+    yaxis=YAxis(
+        title='Body Temperature',
+        type='linear',
+        autorange=True
+    )
+)
+
 
 # Make a figure object
 fig = Figure(data=data, layout=layout)
@@ -85,13 +108,15 @@ while 1:
     i += 1   # add to counter
     byte = ser.readline()
     if header in byte:
-        heartrate = ser.readline()
+        help1 = ser.readline()
         temp = ser.readline()
+        heartrate = ser.readline()
+
         print(heartrate)
 
     # Current time on x-axis, random numbers on y-axis
-    x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    y = heartrate
+    x = datetime.datetime.now().strftime('%H:%M:%S')
+    y = str(float(temp)+10)
 
     # (-) Both x and y are numbers (i.e. not lists nor arrays)
 
