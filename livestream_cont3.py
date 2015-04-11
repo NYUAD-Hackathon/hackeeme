@@ -1,3 +1,5 @@
+__author__ = 'student'
+
 # (*) To communicate with Plotly's server, sign in with credentials file
 import plotly.plotly as py
 
@@ -11,6 +13,20 @@ import numpy as np  # (*) numpy for math functions and arrays
 
 import datetime
 import time
+
+import serial
+
+ser = serial.Serial('/dev/tty.usbmodem1411',baudrate = 9600, timeout = 1)
+ser.close()
+ser.open()
+header = "A"
+footer = "D"
+byte = ""
+temp = 0
+heartrate = 0
+
+
+
 
 
 stream_ids = tls.get_credentials_file()['stream_ids']
@@ -29,21 +45,13 @@ stream = Stream(
 
 # Initialize trace of streaming plot by embedding the unique stream_id
 trace1 = Scatter(
-    x1=[],
-    y1=[],
+    x=[],
+    y=[],
     mode='lines+markers',
-    stream=stream,         # (!) embed stream id, 1 per trace
-    #name= "pulse",
-)
-trace2= Scatter(
-    x2=[],
-    y2=[],
-    mode='lines+markers'
-    #name= "max. healthy pulse value",
-    stream=stream,
+    stream=stream         # (!) embed stream id, 1 per trace
 )
 
-data = Data([trace1, trace2])
+data = Data([trace1])
 
 #Add title to layout object
 layout = Layout(title='Heart Rate')
@@ -75,13 +83,16 @@ time.sleep(5)
 
 while 1:
     i += 1   # add to counter
+    byte = ser.readline()
+    if header in byte:
+        heartrate = ser.readline()
+        temp = ser.readline()
+        print(heartrate)
 
     # Current time on x-axis, random numbers on y-axis
-    x1 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    y1 = (np.cos(k*i/50.)*np.cos(i/50.)+np.random.randn(1))[0]
+    x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+    y = heartrate
 
-    x2 = x1,
-    y2= 100,
     # (-) Both x and y are numbers (i.e. not lists nor arrays)
 
     # (@) write to Plotly stream!
@@ -94,3 +105,4 @@ while 1:
 
 # (@) Close the stream when done plotting
 s.close()
+ser.close()
